@@ -1,9 +1,14 @@
 const express = require("express");
 const dotenv = require("dotenv");
+const connectDB = require("./config/db");
+
 const app = express();
+app.use(express.json());
 
 dotenv.config({ path: "config/config.env" });
 const PORT = process.env.PORT || 3000;
+
+connectDB();
 
 const hospital = require("./router/hospitals.js");
 
@@ -16,7 +21,7 @@ app.get("/", (req, res) => {
   });
 });
 
-app.listen(
+const server = app.listen(
   PORT,
   console.log(
     "server is runing in",
@@ -25,3 +30,8 @@ app.listen(
     PORT
   )
 );
+
+process.on("unhandledRejection", (err, promise) => {
+  console.log(`Error: ${err.message}`);
+  server.close(() => process.exit());
+});
