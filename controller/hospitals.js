@@ -1,34 +1,92 @@
-exports.getAllHospital = (req, res, next) => {
-  res.status(200).json({
-    success: true,
-    message: "show all hospitals",
+const hospital = require("../model/hospitals");
+
+exports.getAllHospital = async (req, res, next) => {
+  try {
+    const result = await hospital.find();
+    res.status(200).json({
+      success: true,
+      count: result.length,
+      data: result,
+    });
+  } catch (err) {}
+  console.error(err);
+  res.status(400).json({
+    success: false,
   });
 };
 
-exports.getOneHospital = (req, res, next) => {
-  res.status(200).json({
-    success: true,
-    message: `show hospital ${req.params.id}`,
-  });
+exports.getOneHospital = async (req, res, next) => {
+  try {
+    const result = await hospital.findById(req.params.id);
+
+    if (!result) {
+      res.status(400).json({
+        success: false,
+      });
+    }
+    res.status(200).json({
+      success: true,
+      data: result,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(400).json({
+      success: false,
+    });
+  }
 };
 
-exports.createHostpital = (req, res, next) => {
+exports.createHostpital = async (req, res, next) => {
+  const result = await hospital.create(req.body);
   res.status(201).json({
     success: true,
-    message: `create new hospital`,
+    data: result,
   });
 };
 
-exports.updateHostpital = (req, res, next) => {
-  res.status(200).json({
-    success: true,
-    message: `update hostpital ${req.params.id}`,
-  });
+exports.updateHostpital = async (req, res, next) => {
+  try {
+    const result = await hospital.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+      runValidators: true,
+    });
+
+    if (!result) {
+      res.status(400).json({
+        success: false,
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: result,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(400).json({
+      success: false,
+    });
+  }
 };
 
-exports.deleteHostpital = (req, res, next) => {
-  res.status(200).json({
-    success: true,
-    message: `delete hostpital ${req.params.id}`,
-  });
+exports.deleteHostpital = async (req, res, next) => {
+  try {
+    const result = await hospital.findByIdAndDelete(req.params.id);
+
+    if (!result) {
+      res.status(400).json({
+        success: false,
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: {},
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(400).json({
+      success: false,
+    });
+  }
 };
